@@ -1,0 +1,106 @@
+package com.springboot.springbootfirst.controller;
+
+import com.springboot.springbootfirst.dto.UserForm;
+import com.springboot.springbootfirst.model.Role;
+import com.springboot.springbootfirst.model.User;
+import com.springboot.springbootfirst.servise.UserService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Collections;
+import java.util.List;
+
+@Controller
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @RequestMapping(value = {"/admin"}, method = RequestMethod.GET)
+    public String index() {
+        return "index";
+    }
+
+
+    @RequestMapping(value = {"/admin/userlist"}, method = RequestMethod.GET)
+    public String userList(Model model) {
+        List<User> users = userService.listUsers();
+        model.addAttribute("users", users);
+        return "userlist";
+    }
+
+    @RequestMapping(value = {"/admin/adduser"}, method = RequestMethod.GET)
+    public String showAddUserPage(Model model) {
+        UserForm userForm = new UserForm();
+        model.addAttribute("userform", userForm);
+        return "adduser";
+    }
+
+    @RequestMapping(value = {"/admin/adduser"}, method = RequestMethod.POST)
+    public String saveUser(Model model, @ModelAttribute("userform") UserForm userForm) {
+
+        String nickname = userForm.getNickname();
+        String email = userForm.getEmail();
+        String password = userForm.getPassword();
+
+        if (nickname != null && nickname.length() > 0
+                && email != null && email.length() > 0) {
+            userService.add(new User(nickname, email, password, Collections.singleton(new Role("ROLE_USER"))));
+            return "redirect:userlist";
+        }
+        return "adduser";
+    }
+
+    @RequestMapping(value = {"/admin/edituser"}, method = RequestMethod.GET)
+    public String showEditPage(@RequestParam(value = "id") Long id, Model model) {
+        model.addAttribute("userform", new UserForm());
+        model.addAttribute("user", userService.getUser(id));
+        return "edituser";
+    }
+
+    @RequestMapping(value = {"/admin/edit"}, method = RequestMethod.POST)
+    public String editUser(@ModelAttribute("userform") UserForm editForm, @RequestParam(value = "id") Long id) {
+        String newNickname = editForm.getNickname();
+        String newEmail = editForm.getEmail();
+        String newPassword = editForm.getPassword();
+
+        if (newNickname != null && newNickname.length() > 0) {
+            userService.changeNickname(id, newNickname);
+        }
+        if (newEmail != null && newEmail.length() > 0) {
+            userService.changeEmail(id, newEmail);
+        }
+        if (newPassword != null && newPassword.length() > 0) {
+            userService.changePassword(id, newPassword);
+        }
+
+        return "redirect:userlist";
+    }
+
+
+    @RequestMapping(value = {"/admin/delete"})
+    public String delete(@RequestParam(value = "id") Long id) {
+        System.out.println(id);
+        userService.deleteUser(id);
+        return "redirect:userlist";
+    }
+
+    @RequestMapping(value = {"/user"}, method = RequestMethod.GET)
+    public String showInfoPage(Model model) {
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        model.addAttribute("user", user);
+        return "userinfo";
+    }
+
+}
