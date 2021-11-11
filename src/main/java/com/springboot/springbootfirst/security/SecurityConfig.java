@@ -50,9 +50,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/*").hasRole("ADMIN")
                 .antMatchers("/user").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
-                .and().formLogin()  // Spring сам подставит свою логин форму
+                .and().formLogin().loginPage("/login")
+                // Указываем параметры логина и пароля с формы логина
+                .usernameParameter("j_username")
+                .passwordParameter("j_password")
                 .successHandler(successUserHandler); // подключаем наш SuccessHandler для перенеправления по ролям;
     }
+
+    //.permitAll();
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

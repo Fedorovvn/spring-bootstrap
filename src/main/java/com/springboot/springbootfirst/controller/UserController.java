@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 public class UserController {
@@ -25,16 +26,18 @@ public class UserController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = {"/admin"}, method = RequestMethod.GET)
-    public String index() {
-        return "index";
+    @RequestMapping(value = {"/login"}, method = RequestMethod.GET)
+    public String login() {
+        return "login";
     }
 
-
-    @RequestMapping(value = {"/admin/userlist"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/admin"}, method = RequestMethod.GET)
     public String userList(Model model) {
         List<User> users = userService.listUsers();
         model.addAttribute("users", users);
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        model.addAttribute("user", user);
+        model.addAttribute("userform", new UserForm());
         return "userlist";
     }
 
@@ -42,39 +45,50 @@ public class UserController {
     public String showAddUserPage(Model model) {
         UserForm userForm = new UserForm();
         model.addAttribute("userform", userForm);
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        model.addAttribute("user", user);
         return "adduser";
     }
 
     @RequestMapping(value = {"/admin/adduser"}, method = RequestMethod.POST)
-    public String saveUser(Model model, @ModelAttribute("userform") UserForm userForm) {
+    public String saveUser(@ModelAttribute("userform") UserForm userForm) {
 
-        String nickname = userForm.getNickname();
+        String firstname = userForm.getFirstname();
+        String lastname = userForm.getLastname();
+        Integer age = userForm.getAge();
         String email = userForm.getEmail();
         String password = userForm.getPassword();
+        String role = userForm.getRole();
 
-        if (nickname != null && nickname.length() > 0
-                && email != null && email.length() > 0) {
-            userService.add(new User(nickname, email, password, Collections.singleton(new Role("ROLE_USER"))));
-            return "redirect:userlist";
+        if (firstname != null && firstname.length() > 0
+                && lastname != null && email.length() > 0
+                && age != null
+                && email != null && email.length() > 0
+                && password != null && password.length() > 0
+                && role != null && role.length() > 0) {
+            userService.add(new User(firstname, lastname, age, email, password, Collections.singleton(new Role(role))));
+            return "redirect:";
         }
         return "adduser";
     }
 
-    @RequestMapping(value = {"/admin/edituser"}, method = RequestMethod.GET)
-    public String showEditPage(@RequestParam(value = "id") Long id, Model model) {
-        model.addAttribute("userform", new UserForm());
-        model.addAttribute("user", userService.getUser(id));
-        return "edituser";
-    }
-
     @RequestMapping(value = {"/admin/edit"}, method = RequestMethod.POST)
     public String editUser(@ModelAttribute("userform") UserForm editForm, @RequestParam(value = "id") Long id) {
-        String newNickname = editForm.getNickname();
+        String newLastname = editForm.getLastname();
+        String newFirstname = editForm.getFirstname();
+        Integer newAge = editForm.getAge();
         String newEmail = editForm.getEmail();
         String newPassword = editForm.getPassword();
+        String newRole = editForm.getRole();
 
-        if (newNickname != null && newNickname.length() > 0) {
-            userService.changeNickname(id, newNickname);
+        if (newFirstname != null && newFirstname.length() > 0) {
+            userService.changeFirstname(id, newFirstname);
+        }
+        if (newLastname != null && newLastname.length() > 0) {
+            userService.changeLastname(id, newLastname);
+        }
+        if (newAge != null) {
+            userService.changeAge(id, newAge);
         }
         if (newEmail != null && newEmail.length() > 0) {
             userService.changeEmail(id, newEmail);
@@ -82,23 +96,24 @@ public class UserController {
         if (newPassword != null && newPassword.length() > 0) {
             userService.changePassword(id, newPassword);
         }
+        if (newRole != null && newRole.length() > 0) {
+            userService.changeRoles(id, Collections.singleton(new Role(newRole)));
+        }
 
-        return "redirect:userlist";
+        return "redirect:";
     }
 
 
     @RequestMapping(value = {"/admin/delete"})
     public String delete(@RequestParam(value = "id") Long id) {
-        System.out.println(id);
         userService.deleteUser(id);
-        return "redirect:userlist";
+        return "redirect:";
     }
 
     @RequestMapping(value = {"/user"}, method = RequestMethod.GET)
     public String showInfoPage(Model model) {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         model.addAttribute("user", user);
         return "userinfo";
     }

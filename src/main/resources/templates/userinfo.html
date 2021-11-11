@@ -1,21 +1,74 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8" />
-    <title>Edit User</title>
+    <meta charset="UTF-8"/>
+    <title>User List</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
-<h1>Your info: </h1>
-<br/><br/>
-Your nickname: <a th:utext="${user.nickname}"></a>
-<br/><br/>
-Your e-mail: <a th:utext="${user.email}"></a>
-<br/><br/>
-Your registration date: <a th:utext="${user.registrationDate}"></a>
-<br/><br/>
-Your role: <a th:utext="${user.roles}"></a>
-<br/><br/>
-<a th:href="@{/logout}">Logout</a>
+
+<nav class="navbar navbar-dark bg-dark">
+<span class="navbar-brand mb-0 h1">
+        <span th:utext="${user.email}"></span>
+        <span class="font-weight-light"> with roles: </span>
+        <span th:utext="${user.rolesToString()}" class="font-weight-light"></span>
+</span>
+    <a class="text-secondary" th:href="@{/logout}">Logout</a>
+</nav>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-2 vh-100">
+            <br/>
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <a sec:authorize="hasRole('ROLE_ADMIN')" class="nav-link" id="v-pills-home-tab" data-toggle="pill" th:href="@{/admin}" role="tab"
+                   aria-controls="v-pills-home" aria-selected="true">Admin</a>
+                <a class="nav-link active" id="v-pills-profile-tab" data-toggle="pill" th:href="@{/user}" role="tab"
+                   aria-controls="v-pills-profile" aria-selected="false">User</a>
+            </div>
+        </div>
+        <div class="col bg-light vh-100">
+
+            <div class="px-md-3">
+                <br/>
+                <h1>User information-page</h1>
+                <br/>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4>About user</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="v-pills-tabContent">
+                            <table class="table table-hover">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Firstname</th>
+                                    <th>Lastname</th>
+                                    <th>Age</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                </tr>
+                                <tr>
+                                    <td th:utext="${user.id}">...</td>
+                                    <td th:utext="${user.firstname}">...</td>
+                                    <td th:utext="${user.lastname}">...</td>
+                                    <td th:utext="${user.age}">...</td>
+                                    <td th:utext="${user.email}">...</td>
+                                    <td th:utext="${user.rolesToString()}">...</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

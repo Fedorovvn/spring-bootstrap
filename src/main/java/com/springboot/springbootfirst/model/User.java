@@ -1,5 +1,6 @@
 package com.springboot.springbootfirst.model;
 
+import com.springboot.springbootfirst.dto.UserForm;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -16,10 +17,16 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nickname", unique = true)
-    private String nickname;
+    @Column(name = "firstname")
+    private String firstname;
 
-    @Column(name = "email")
+    @Column(name = "lastname")
+    private String lastname;
+
+    @Column(name = "age")
+    private Integer age;
+
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "password")
@@ -31,16 +38,41 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-    @Column(name = "date")
-    private final Date registrationDate = new Date();
 
-    public User() {}
+    public User() {
+    }
 
-    public User(String nickname, String email, String password, Set<Role> roles) {
-        this.nickname = nickname;
+    public User(String firstname, String lastname, Integer age, String email, String password, Set<Role> roles) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.age = age;
         this.email = email;
         this.password = password;
         this.roles = roles;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
     @Override
@@ -68,13 +100,6 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
 
     public String getEmail() {
         return email;
@@ -89,10 +114,6 @@ public class User implements UserDetails {
         return super.toString();
     }
 
-    public Date getRegistrationDate() {
-        return registrationDate;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
@@ -100,7 +121,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return nickname;
+        return email;
     }
 
     @Override
@@ -121,5 +142,13 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public String rolesToString() {
+        String stringRoles = "";
+        for (Role role : roles) {
+            stringRoles += " " + role.toString().substring(5);
+        }
+        return stringRoles;
     }
 }

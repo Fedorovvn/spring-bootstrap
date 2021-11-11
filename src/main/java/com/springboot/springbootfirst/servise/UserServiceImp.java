@@ -1,10 +1,12 @@
 package com.springboot.springbootfirst.servise;
 
 import com.springboot.springbootfirst.dao.UserDao;
+import com.springboot.springbootfirst.model.Role;
 import com.springboot.springbootfirst.model.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserServiceImp implements UserService {
@@ -34,11 +36,20 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void changeNickname(Long id, String newNickname){ userDao.changeNickname(id, newNickname);}
-
-    @Override
     public void changeEmail(Long id, String newEmail){ userDao.changeEmail(id, newEmail); }
 
     @Override
     public void changePassword(Long id, String newPassword){ userDao.changePassword(id, newPassword); }
+
+    @Override
+    public void changeFirstname(Long id, String newFirstname){ userDao.changeFirstname(id, newFirstname); }
+
+    @Override
+    public void changeLastname(Long id, String newLastname){ userDao.changeLastname(id, newLastname); }
+
+    @Override
+    public void changeAge(Long id, Integer newAge){ userDao.changeAge(id, newAge); }
+
+    @Override
+    public void changeRoles(Long id, Set<Role> newRoles){ userDao.changeRoles(id, newRoles); }
 }
